@@ -20,7 +20,7 @@ class Scraper:
     """
 
     
-    def __init__(self, sec_sleep=0.5):
+    def __init__(self, sec_sleep: float=0.5):
         """
         Initiate the Scraper.
         """
@@ -47,7 +47,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def load_page(self, url, try_quitting_first=True):
+    def load_page(self, url: str, try_quitting_first: bool=True):
         """
         Takes a url and open the associated page,
         with the possibility of first quitting current
@@ -69,7 +69,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def login(self, email, password):
+    def login(self, email: str, password: str):
         """
         Take email and password, enter them and click on "sign in".
         """
@@ -106,7 +106,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def enter_keywords(self, keywords):
+    def enter_keywords(self, keywords: str):
         """
         Write keywords in the job search bar.
         """
@@ -116,7 +116,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def enter_location(self, location):
+    def enter_location(self, location: str):
         """
         Write location wanted in the location search bar.
         """
@@ -175,7 +175,7 @@ class Scraper:
         return job_data
 
     
-    def scrap_jobs(self, max_page=100, verbose=False):
+    def scrap_jobs(self, max_page: int=100, verbose: bool=False):
         """
         Starting from the first job page, iterate until max page is attained
         and get all job infos per page using previous `get_job_details()` method.
@@ -204,7 +204,7 @@ class Scraper:
                 return job_df
     
             # wait and scroll down
-            scroll_to_bottom()
+            self.scroll_to_bottom()
     
             # get job infos and add them to current `job_df`
             new_job_df = self.get_job_details()
