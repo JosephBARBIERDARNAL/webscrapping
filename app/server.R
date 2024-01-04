@@ -5,28 +5,34 @@ source('src/nlp.R')
 
 server <- function(input, output) {
   
-  # Sample dataset, replace with your own
+  # Open dataset
   dataset <- read.csv2('../data/job_df.csv', sep = ',')
-  dataset= dataset %>%
-    select(-c('Job.ID'))
+  dataset <- dataset %>% select(-c('Job.ID'))
+
+  # Extract keywords from resume
+  resumeKeywords <- reactive({
+    req(input$resume)
+    extractKeywordsFromResume(input$resume$datapath)
+  })
   
+  # Render keywords
+  output$keywordsDisplay <- renderUI({
+    keywords <- resumeKeywords()
+    if (is.null(keywords)) {
+      return("No keywords extracted or resume not uploaded.")
+    } else {
+      keywords <- removeStopwords(keywords, language = "fr")
+      return(paste("Keywords: ", paste(keywords, collapse = ", ")))
+    }
+  })
   
   output$table <- renderDT({
-    keyword <- input$keyword
-    # Ensure that keyword input is not NULL or empty
-    if (is.null(keyword) || keyword == "") {
-      return(datatable(dataset, options = list(pageLength = 5), filter="top"))
-    }
-    
-    # Splitting the keywords for multiple keyword functionality
-    keywords <- unlist(strsplit(tolower(keyword), " "))
-    if (length(keywords) == 0) {
-      return(datatable(dataset, options = list(pageLength = 5)))
-    }
+    keywordInput <- input$keyword
+    resumeKeywords <- resumeKeywords()
+    keywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
     
     # Filtering data based on keyword occurrence
     filtered_data <- dataset[apply(dataset, 1, function(row) keywordCount(row, keywords) >= 2), ]
-    print('yes')
     
     # Check if the filtered data is empty or not
     if (nrow(filtered_data) == 0) {
