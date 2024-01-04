@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.opera import OperaDriverManager
 
 # other
 import pandas as pd
@@ -24,13 +25,13 @@ class Scraper:
         """
         Initiate the Scraper.
         """
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Safari()
         self.sec_sleep = sec_sleep
         
         
     def close_browser(self):
         """
-        Close all browser tabs
+        Close all browser tabs.
         """
         self.driver.quit()
 
@@ -204,7 +205,7 @@ class Scraper:
                 return job_df
     
             # wait and scroll down
-            scroll_to_bottom()
+            self.scroll_to_bottom()
     
             # get job infos and add them to current `job_df`
             new_job_df = self.get_job_details()
@@ -218,3 +219,6 @@ class Scraper:
             # save df at each iteration for safety
             job_df = job_df.reset_index(drop=True)
             job_df.to_csv('../data/job_df.csv', index=False)
+            
+        print("Last page, scrapping over")
+        return job_df

@@ -4288,3 +4288,21 @@ Read port: 49720
 1703149381806	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
 DevTools listening on ws://127.0.0.1:49713/devtools/browser/083912e8-4da4-4bd8-ba26-1c34f15e477c
 1703149383075	Marionette	INFO	Stopped listening on port 49720
+1703274597789	geckodriver	INFO	Listening on 127.0.0.1:58700
+1703274598293	mozrunner::runner	INFO	Running command: MOZ_CRASHREPORTER="1" MOZ_CRASHREPORTER_NO_REPORT="1" MOZ_CRASHREPORTER_SHUTDOWN="1" MOZ_NO_REMOTE="1" "/App ... s" "localhost" "-foreground" "-no-remote" "-profile" "/var/folders/m2/jfzxyg4s0xz3jyw5f94r7tcm0000gn/T/rust_mozprofileQWsflJ"
+console.warn: services.settings: Ignoring preference override of remote settings server
+console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+2023-12-22 20:49:58.732 firefox-bin[13914:322276] WARNING: Secure coding is not enabled for restorable state! Enable secure coding by implementing NSApplicationDelegate.applicationSupportsSecureRestorableState: and returning YES.
+1703274598911	Marionette	INFO	Marionette enabled
+console.error: "Warning: unrecognized command line flag" "-remote-allow-hosts"
+1703274599248	Marionette	INFO	Listening on port 58709
+WebDriver BiDi listening on ws://127.0.0.1:58701
+Read port: 58709
+1703274599530	RemoteAgent	WARN	TLS certificate errors will be ignored for this session
+DevTools listening on ws://127.0.0.1:58701/devtools/browser/98c92cd7-12c1-47cd-9946-54590bb3dc9c
+1703274600593	Marionette	INFO	Stopped listening on port 58709
+console.error: services.settings: 
+  main/partitioning-exempt-urls Signature failed  TypeError: NetworkError: Network request failed
+console.error: Region.sys.mjs: "Error fetching region" (new TypeError("NetworkError when attempting to fetch resource.", ""))
+console.error: Region.sys.mjs: "Failed to fetch region" (new Error("NO_RESULT", "resource://gre/modules/Region.sys.mjs", 411))
+console.error: (new NetworkError("Network error: TypeError: NetworkError: Network request failed", "resource://services-settings/RemoteSettingsClient.sys.mjs", 107))
