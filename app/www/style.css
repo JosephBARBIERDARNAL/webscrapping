@@ -1,0 +1,10 @@
+/* styles.css */
+
+body {
+  background-color: #333; /* background color */
+  color: white; /* text color */
+}
+
+.dataTables_wrapper {
+  font-size: 16px; /* Larger font size for the data table */
+}

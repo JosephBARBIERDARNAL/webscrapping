@@ -3,5 +3,5 @@ credentials.txt
 __pycache__/
 *.log
 .DS_Store
-.ipynb_checkpoints/
+/.ipynb_checkpoints/
 .Rproj.user

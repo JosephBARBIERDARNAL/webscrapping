@@ -1,28 +1,38 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
+library(DT)
+library(dplyr)
+source('src/nlp.R')
 
-# Define server logic required to draw a histogram
-function(input, output, session) {
-
-    output$distPlot <- renderPlot({
-
-        # generate bins based on input$bins from ui.R
-        x    <- faithful[, 2]
-        bins <- seq(min(x), max(x), length.out = input$bins + 1)
-
-        # draw the histogram with the specified number of bins
-        hist(x, breaks = bins, col = 'darkgray', border = 'white',
-             xlab = 'Waiting time to next eruption (in mins)',
-             main = 'Histogram of waiting times')
-
-    })
-
+server <- function(input, output) {
+  
+  # Sample dataset, replace with your own
+  dataset <- read.csv2('../data/job_df.csv', sep = ',')
+  dataset= dataset %>%
+    select(-c('Job.ID'))
+  
+  
+  output$table <- renderDT({
+    keyword <- input$keyword
+    # Ensure that keyword input is not NULL or empty
+    if (is.null(keyword) || keyword == "") {
+      return(datatable(dataset, options = list(pageLength = 5), filter="top"))
+    }
+    
+    # Splitting the keywords for multiple keyword functionality
+    keywords <- unlist(strsplit(tolower(keyword), " "))
+    if (length(keywords) == 0) {
+      return(datatable(dataset, options = list(pageLength = 5)))
+    }
+    
+    # Filtering data based on keyword occurrence
+    filtered_data <- dataset[apply(dataset, 1, function(row) keywordCount(row, keywords) >= 2), ]
+    print('yes')
+    
+    # Check if the filtered data is empty or not
+    if (nrow(filtered_data) == 0) {
+      return(DT::datatable(data.frame(), options = list(pageLength = 5), filter="top"))
+    } else {
+      return(DT::datatable(filtered_data, options = list(pageLength = 5), filter="top"))
+    }
+  })
 }
