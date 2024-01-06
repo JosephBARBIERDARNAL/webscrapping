@@ -22,23 +22,36 @@ server <- function(input, output) {
       return("No keywords extracted or resume not uploaded.")
     } else {
       keywords <- removeStopwords(keywords, language = "fr")
-      return(paste("Keywords: ", paste(keywords, collapse = ", ")))
+      return(paste(keywords, collapse = ", "))
     }
   })
   
   output$table <- renderDT({
     keywordInput <- input$keyword
     resumeKeywords <- resumeKeywords()
-    keywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
-    
-    # Filtering data based on keyword occurrence
-    filtered_data <- dataset[apply(dataset, 1, function(row) keywordCount(row, keywords) >= 2), ]
-    
-    # Check if the filtered data is empty or not
-    if (nrow(filtered_data) == 0) {
-      return(DT::datatable(data.frame(), options = list(pageLength = 5), filter="top"))
+    allKeywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
+
+    # Filter dataset to include rows containing all keywords in the Description
+    filtered_data <- dataset %>%
+      filter(sapply(tolower(Description), function(description) all(sapply(keywordInput, function(keyword) grepl(keyword, description)))))
+
+    # Count and sort data based on keyword matches
+    filtered_data$keywordMatchCount <- apply(filtered_data, 1, function(row) keywordCount(tolower(row), allKeywords))
+    sorted_data <- filtered_data[order(-filtered_data$keywordMatchCount), ]
+
+    # Display data if there are matches
+    if (nrow(sorted_data) == 0 || max(sorted_data$keywordMatchCount) == 0) {
+      table_to_display <- data.frame()
     } else {
-      return(DT::datatable(filtered_data, options = list(pageLength = 5), filter="top"))
+      table_to_display <- sorted_data
     }
+
+    # Display the DT table
+    return(DT::datatable(
+        table_to_display,
+        options = list(pageLength = 5),
+        filter="top",
+        class="cell-border stripe hover",
+        selection="single"))
   })
 }

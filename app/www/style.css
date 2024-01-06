@@ -6,24 +6,77 @@ body {
   color: white; /* text color */
 }
 
+/* Links */
+a {
+  color: #fca43f; /* Light text color */
+  text-decoration: none; /* Remove underline */
+  transition: color 0.3s ease-in-out; /* Add transition for hover effects */
+}
+
+/* Links hover */
+a:hover {
+  color: #f23838; /* Dark text color */
+  text-decoration: none; /* Remove underline */
+}
+
+/* Tabs */
+.tabs {
+  background-color: #f23838; /* background color */
+  color: #000000; /* text color */
+  padding: 10px; /* Add some padding for aesthetics */
+}
+
+/* Tabs hover */
+.tabs:hover {
+  background-color: #fca43f; /* background color */
+  color: #000000; /* text color */
+  padding: 10px; /* Add some padding for aesthetics */
+}
+
+/* HomePage container */
+.home {
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* HomePage title */
+.home-title h1 {
+  font-size: 50px; /* Larger font size for the title */
+  font-weight: bold; /* Bold font weight for the title */
+}
+
+/* HomePage content */
+.home-description {
+  font-size: 22px; /* Larger font size for the description */
+}
+
+/* Keywords displayed */
+.keywords-display-output {
+  font-size: 20px; /* Larger font size for the keywords */
+  color: white; /* text color */
+}
+
 /* Rendered table output */
 .dataTables_wrapper {
   font-size: 16px; /* larger font size for the data table */
   background-color: #444d4b; /* background color */
   color: white; /* text color */
+  padding: 10px; /* Add some padding for aesthetics */
 }
 
 /* Sidebar */
 .sidebar .sidebar-content {
   color: #000000; /* Light text color */
-  padding: 30px; /* Add some padding for aesthetics */
+  padding: 20px; /* Add some padding for aesthetics */
+  margin-top: 20px; /* Add some margin for aesthetics */
+  font-size: 16px; /* Larger font size for the sidebar */
 }
 
 /* Sidebar not in .main class */
 .sidebar :not(.main) {
-  background-color: #f23838; /* Example: a soft green background */
-  color: #000000; /* Light text color */
-  padding: 10px; /* Add some padding for aesthetics */
+  background-color: #fbf3e4; /* Example: a soft green background */
+  color: #000000; /* Text color */
+  padding: 3px; /* Add some padding for aesthetics */
 }
 
 /* Sidebar input field */
