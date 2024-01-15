@@ -13,20 +13,28 @@ import time
 
 
 
-class Scraper:
+class LinkedIn:
     """
-    The Scraper() class contains all main features needed to
+    The LinkedIn() class contains all main features needed to
     build a linkedin job scraper. It contains various methods
     for login, cookies, searching or scraping.
     """
 
     
-    def __init__(self, sec_sleep: float=0.5):
+    def __init__(self, sec_sleep: float=1):
         """
         Initiate the Scraper.
         """
-        self.driver = webdriver.Safari()
+        self.driver = webdriver.Chrome('/opt/homebrew/bin/chromedriver')
+        #self.driver = webdriver.Safari()
         self.sec_sleep = sec_sleep
+       
+    
+    def sleep(self, n: float=1.0):
+        """
+        Pause scraper for a given amount of time
+        """
+        time.sleep(self.sec_sleep)
         
         
     def close_browser(self):
@@ -87,7 +95,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def press_enter_and_scroll(self):
+    def press_enter(self):
         """
         After keywords filled, searching for related jobs and scrolling
         to the bottom of the page in order to be sure every job is displayed.
@@ -95,7 +103,6 @@ class Scraper:
         search_field = self.driver.find_element(By.XPATH, "(//*[contains(@id, 'jobs-search-box-location-id-ember')])[last()]")
         search_field.send_keys(Keys.ENTER)
         time.sleep(self.sec_sleep)
-        self.scroll_to_bottom()
 
         
     def close_message(self):
@@ -127,7 +134,7 @@ class Scraper:
         time.sleep(self.sec_sleep)
 
         
-    def get_job_details(self):
+    def get_job_details(self) -> pd.DataFrame:
         """
         For a given job page, get all infos displayed, store them
         into a pandas dataframe and return it.
@@ -176,7 +183,7 @@ class Scraper:
         return job_data
 
     
-    def scrap_jobs(self, max_page: int=100, verbose: bool=False):
+    def scrap_jobs(self, max_page: int=100, verbose: bool=False) -> pd.DataFrame:
         """
         Starting from the first job page, iterate until max page is attained
         and get all job infos per page using previous `get_job_details()` method.
