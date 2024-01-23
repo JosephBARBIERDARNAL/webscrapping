@@ -5,6 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.opera import OperaDriverManager
+#from selenium import StaleElementReferenceException
 
 # other
 import pandas as pd
@@ -25,8 +26,8 @@ class LinkedIn:
         """
         Initiate the Scraper.
         """
-        self.driver = webdriver.Chrome('/opt/homebrew/bin/chromedriver')
-        #self.driver = webdriver.Safari()
+        #self.driver = webdriver.Chrome('/opt/homebrew/bin/chromedriver')
+        self.driver = webdriver.Firefox()
         self.sec_sleep = sec_sleep
        
     
@@ -56,7 +57,7 @@ class LinkedIn:
         time.sleep(self.sec_sleep)
 
         
-    def load_page(self, url: str, try_quitting_first: bool=True):
+    def load_page(self, url: str, try_quitting_first: bool=False):
         """
         Takes a url and open the associated page,
         with the possibility of first quitting current
@@ -136,7 +137,7 @@ class LinkedIn:
         
     def get_job_details(self) -> pd.DataFrame:
         """
-        For a given job page, get all infos displayed, store them
+        For a given job page, get all infos displayed per job, store them
         into a pandas dataframe and return it.
         """
             
@@ -153,37 +154,45 @@ class LinkedIn:
     
         # extract details from `job_cards`
         for card in job_cards:
-            job_id = card.get_attribute('data-job-id')
-            title_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__link.job-card-list__title')
-            company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
-            location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
-            date_element = card.find_element(By.XPATH, "//span[@class='tvm__text tvm__text--neutral']/span")
-            
-            # add elements to lists if found
-            if job_id:
-                try:
-                    job_ids.append(job_id)
-                    job_titles.append(title_element.text if title_element else 'N/A')
-                    companies.append(company_element.text if company_element else 'N/A')
-                    locations.append(location_element.text if location_element else 'N/A')
-                    descriptions.append(card.text if card else 'N/A')
-                    posted_dates.append(date_element.text if date_element else 'N/A')
-                except:
-                    pass
+            try:
+                job_id = card.get_attribute('data-job-id')
+                title_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__link.job-card-list__title')
+                company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
+                location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
+                date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
+
+                # add elements to lists if found
+                if job_id:
+                    try:
+                        job_ids.append(job_id)
+                        job_titles.append(title_element.text if title_element else 'N/A')
+                        companies.append(company_element.text if company_element else 'N/A')
+                        locations.append(location_element.text if location_element else 'N/A')
+                        descriptions.append(card.text if card else 'N/A')
+                        posted_dates.append(date_element.text if date_element else 'N/A')
+                        self.sleep(1)
+                    except:
+                        pass
+                    
+            # we skip jobs that lead to stale exception
+            except:
+                pass
     
         # output the results
+        if len(posted_dates)!=len(job_ids):
+            posted_dates.append(posted_dates[-1])
         job_data = pd.DataFrame({
             'Job ID': job_ids,
             'Title': job_titles,
             'Company': companies,
             'Location': locations,
             'Description': descriptions,
-            'Date': posted_dates,
+            'Date': posted_dates
         })
         return job_data
 
     
-    def scrap_jobs(self, max_page: int=100, verbose: bool=False) -> pd.DataFrame:
+    def scrap_jobs(self, file_name: str, max_page: int=100, verbose: bool=False) -> pd.DataFrame:
         """
         Starting from the first job page, iterate until max page is attained
         and get all job infos per page using previous `get_job_details()` method.
@@ -197,7 +206,7 @@ class LinkedIn:
         # start with next page
         page = 2
         
-        while (True and page < max_page):
+        while page < max_page:
         
             # go to next page
             next_page_xpath = f'//button[@aria-label="Page {page}"]'
@@ -206,9 +215,9 @@ class LinkedIn:
                 next_page_button.click()
                 page += 1
             
-            # next page not found, stop scrapping and return `job_df`
-            except:
-                print("Last page, scrapping over")
+            # stop scrapping and return `job_df`
+            except Exception as e:
+                print(f"Scrapping over. {len(job_df)} jobs found.")
                 return job_df
     
             # wait and scroll down
@@ -225,7 +234,32 @@ class LinkedIn:
             
             # save df at each iteration for safety
             job_df = job_df.reset_index(drop=True)
-            job_df.to_csv('../data/job_df.csv', index=False)
+            job_df.to_csv(f'../data/{file_name}.csv', index=False)
             
-        print("Last page, scrapping over")
+        print(f"Scrapping over. {len(job_df)} jobs found.")
         return job_df
+    
+    
+    def get_all_jobs(self, location: str, keywords: str='data science') -> pd.DataFrame:
+        """
+        Use most other methods to get all available jobs
+        for the current search (location and keywords).
+        Returns the dataframe containing all jobs for the
+        selected location and keywords.
+        """
+        
+        # enter user input
+        self.enter_keywords(keywords)
+        self.enter_location(location)
+        self.press_enter()
+        
+        # scrolling allows to load more jobs
+        self.sleep(5)
+        self.scroll_to_bottom() 
+
+        # file name used to saved the dataframe
+        file_name = f"linkedin_{keywords.replace(' ', '_')}_{location.replace(' ', '_')}"
+        
+        # scrap all jobs and return it in main file
+        jobs_df = self.scrap_jobs(file_name=file_name)
+        return jobs_df
