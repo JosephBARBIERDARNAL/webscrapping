@@ -4,14 +4,16 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.opera import OperaDriverManager
-#from selenium import StaleElementReferenceException
+
 
 # other
+from datetime import datetime, timedelta
 import pandas as pd
 import time
 
 
+
+    
 
 
 class LinkedIn:
@@ -133,6 +135,37 @@ class LinkedIn:
         search_field.clear()
         search_field.send_keys(location)
         time.sleep(self.sec_sleep)
+        
+    
+    def change_date_format(date_str: str) -> str:
+        """
+        Change date format from Linkedin such as 
+        '2 weeks ago' or '3 hours ago' to %Y/%m/%d.
+        """
+    
+        # splitting the input string and change format
+        number_str, unit, _ = date_str.split()
+        number = int(number_str)
+        unit = unit.rstrip('s') # plural case
+
+        # mapping units to timedelta arguments
+        unit_to_timedelta = {
+            "day": timedelta(days=number),
+            "week": timedelta(weeks=number),
+            "month": timedelta(days=30 * number),
+            "year": timedelta(days=365 * number),
+            "hour": timedelta(hours=number),
+            "minute": timedelta(minutes=number),
+            "second": timedelta(seconds=number)
+        }
+
+        # compute differences
+        delta = unit_to_timedelta.get(unit)
+        if not delta:
+            raise ValueError(f"Unsupported time unit: {unit}")
+
+        past_date = (datetime.now() - delta).strftime("%Y/%m/%d")
+        return past_date
 
         
     def get_job_details(self) -> pd.DataFrame:
