@@ -28,7 +28,6 @@ class LinkedIn:
         """
         Initiate the Scraper.
         """
-        #self.driver = webdriver.Chrome('/opt/homebrew/bin/chromedriver')
         self.driver = webdriver.Firefox()
         self.sec_sleep = sec_sleep
        
@@ -56,6 +55,18 @@ class LinkedIn:
         div_element = self.driver.find_element(By.CSS_SELECTOR, ".jobs-search-results-list")
         self.driver.execute_script("arguments[0].scrollIntoView(true);", div_element)
         self.driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight;", div_element)
+        time.sleep(self.sec_sleep)
+        
+    
+    def scroll(self, px: int=200):
+        """
+        Scroll a little bit down on the job page.
+        It first finds the job list object and then scrolls down a little bit.
+        """
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-results-list")))
+        div_element = self.driver.find_element(By.CSS_SELECTOR, ".jobs-search-results-list")
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", div_element)
+        self.driver.execute_script(f"arguments[0].scrollTop += {px};", div_element)
         time.sleep(self.sec_sleep)
 
         
@@ -137,11 +148,15 @@ class LinkedIn:
         time.sleep(self.sec_sleep)
         
     
-    def change_date_format(date_str: str) -> str:
+    def change_date_format(self, date_str: str) -> str:
         """
         Change date format from Linkedin such as 
         '2 weeks ago' or '3 hours ago' to %Y/%m/%d.
         """
+        
+        # special case when there is "reposted" in the time since posted text
+        if date_str.startswith("Reposted"):
+            date_str = date_str.replace("Reposted ", "")
     
         # splitting the input string and change format
         number_str, unit, _ = date_str.split()
@@ -203,10 +218,10 @@ class LinkedIn:
                         locations.append(location_element.text if location_element else 'N/A')
                         descriptions.append(card.text if card else 'N/A')
                         posted_dates.append(date_element.text if date_element else 'N/A')
-                        self.sleep(1)
+                        self.sleep(0.5)
                     except:
                         pass
-                    
+
             # we skip jobs that lead to stale exception
             except:
                 pass
@@ -250,10 +265,10 @@ class LinkedIn:
             
             # stop scrapping and return `job_df`
             except Exception as e:
-                print(f"Scrapping over. {len(job_df)} jobs found.")
+                print(f"Scrapping over: {len(job_df)} jobs found.")
                 return job_df
     
-            # wait and scroll down
+            # scroll down in order to display and load more jobs
             self.scroll_to_bottom()
     
             # get job infos and add them to current `job_df`
@@ -269,7 +284,7 @@ class LinkedIn:
             job_df = job_df.reset_index(drop=True)
             job_df.to_csv(f'../data/{file_name}.csv', index=False)
             
-        print(f"Scrapping over. {len(job_df)} jobs found.")
+        print(f"Scrapping over: {len(job_df)} jobs found.")
         return job_df
     
     
@@ -286,9 +301,8 @@ class LinkedIn:
         self.enter_location(location)
         self.press_enter()
         
-        # scrolling allows to load more jobs
+        # waiting for jobs to load
         self.sleep(5)
-        self.scroll_to_bottom() 
 
         # file name used to saved the dataframe
         file_name = f"linkedin_{keywords.replace(' ', '_')}_{location.replace(' ', '_')}"
