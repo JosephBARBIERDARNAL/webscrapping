@@ -1,0 +1,23 @@
+---
+title: "Webscrapping and Shiny application"
+author: "Barbier--Darnal Joseph, Lacoste Victor, Judic Erwan and Komla Djodji Adayeke"
+output: pdf_document
+---
+
+```{r echo=F}
+knitr::opts_chunk$set(
+    warning=FALSE,
+    message=FALSE,
+    echo=FALSE
+)
+```
+
+# Introduction
+
+## Context
+
+blabla
+
+## Tools
+
+blabla

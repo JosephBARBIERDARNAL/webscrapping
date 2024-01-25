@@ -1,3 +1,3 @@
 git add .
-git commit -m "$commit_message"
+git commit -m "auto push"
 git push 

@@ -181,6 +181,27 @@ class LinkedIn:
 
         past_date = (datetime.now() - delta).strftime("%Y/%m/%d")
         return past_date
+    
+    
+    def get_contract_type(self, contract_text):
+        """
+        TODO
+        """
+        print(contract_text)
+        
+        if 'intern' in contract_text.lower():
+            pass
+        
+        # lower case all content
+        contract_text = contract_text.to_lower()
+        
+        # define mapping to get French contract type
+        contract_mapping = {
+            'contract': 'CDD',
+            'full-time': 'CDI',
+    
+        }
+        return 'N/A'
 
         
     def get_job_details(self) -> pd.DataFrame:
@@ -199,6 +220,7 @@ class LinkedIn:
         locations = []
         descriptions = []
         posted_dates = []
+        contracts = []
     
         # extract details from `job_cards`
         for card in job_cards:
@@ -208,6 +230,7 @@ class LinkedIn:
                 company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
                 location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
                 date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
+                contract_element = card.find_element(By.CSS_SELECTOR, 'li.job-details-jobs-unified-top-card__job-insight:nth-child(1)')
 
                 # add elements to lists if found
                 if job_id:
@@ -218,6 +241,7 @@ class LinkedIn:
                         locations.append(location_element.text if location_element else 'N/A')
                         descriptions.append(card.text if card else 'N/A')
                         posted_dates.append(date_element.text if date_element else 'N/A')
+                        contracts.append(contrat_element.text if contrat_element else 'N/A')
                         self.sleep(0.5)
                     except:
                         pass
@@ -226,9 +250,14 @@ class LinkedIn:
             except:
                 pass
     
-        # output the results
+        
+        # ensure all dates are valid and change their format
         if len(posted_dates)!=len(job_ids):
             posted_dates.append(posted_dates[-1])
+        posted_dates = [self.change_date_format(date) for date in posted_dates]
+        contracts = [self.get_contract_type(contract) for contract in '']
+        
+        # output the results
         job_data = pd.DataFrame({
             'Job ID': job_ids,
             'Title': job_titles,
@@ -245,7 +274,7 @@ class LinkedIn:
         Starting from the first job page, iterate until max page is attained
         and get all job infos per page using previous `get_job_details()` method.
         All jobs are put into a pandas dataframe.
-        The dataframe is then save in the `root/data/` directory as a csv.
+        The dataframe is then save in the `root/www/` directory as a csv.
         """
         
         # get job infos from first page
@@ -282,7 +311,7 @@ class LinkedIn:
             
             # save df at each iteration for safety
             job_df = job_df.reset_index(drop=True)
-            job_df.to_csv(f'../data/{file_name}.csv', index=False)
+            job_df.to_csv(f'www/{file_name}.csv', index=False)
             
         print(f"Scrapping over: {len(job_df)} jobs found.")
         return job_df
