@@ -241,7 +241,7 @@ class LinkedIn:
                         locations.append(location_element.text if location_element else 'N/A')
                         descriptions.append(card.text if card else 'N/A')
                         posted_dates.append(date_element.text if date_element else 'N/A')
-                        contracts.append(contrat_element.text if contrat_element else 'N/A')
+                        contracts.append(contract_element.text if contract_element else 'N/A')
                         self.sleep(0.5)
                     except:
                         pass
@@ -254,8 +254,8 @@ class LinkedIn:
         # ensure all dates are valid and change their format
         if len(posted_dates)!=len(job_ids):
             posted_dates.append(posted_dates[-1])
-        posted_dates = [self.change_date_format(date) for date in posted_dates]
-        contracts = [self.get_contract_type(contract) for contract in '']
+        posted_dates_corrected = [self.change_date_format(date) for date in posted_dates]
+        contracts_corrected = [self.get_contract_type(contract) for contract in '']
         
         # output the results
         job_data = pd.DataFrame({
@@ -264,7 +264,8 @@ class LinkedIn:
             'Company': companies,
             'Location': locations,
             'Description': descriptions,
-            'Date': posted_dates
+            'Date': posted_dates_corrected,
+            'Contract': contracts_corrected
         })
         return job_data
 
