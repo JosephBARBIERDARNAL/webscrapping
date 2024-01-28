@@ -181,27 +181,6 @@ class LinkedIn:
 
         past_date = (datetime.now() - delta).strftime("%Y/%m/%d")
         return past_date
-    
-    
-    def get_contract_type(self, contract_text):
-        """
-        TODO
-        """
-        print(contract_text)
-        
-        if 'intern' in contract_text.lower():
-            pass
-        
-        # lower case all content
-        contract_text = contract_text.to_lower()
-        
-        # define mapping to get French contract type
-        contract_mapping = {
-            'contract': 'CDD',
-            'full-time': 'CDI',
-    
-        }
-        return 'N/A'
 
         
     def get_job_details(self) -> pd.DataFrame:
@@ -220,7 +199,6 @@ class LinkedIn:
         locations = []
         descriptions = []
         posted_dates = []
-        contracts = []
     
         # extract details from `job_cards`
         for card in job_cards:
@@ -230,7 +208,6 @@ class LinkedIn:
                 company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
                 location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
                 date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
-                contract_element = card.find_element(By.CSS_SELECTOR, 'li.job-details-jobs-unified-top-card__job-insight:nth-child(1)')
 
                 # add elements to lists if found
                 if job_id:
@@ -241,7 +218,6 @@ class LinkedIn:
                         locations.append(location_element.text if location_element else 'N/A')
                         descriptions.append(card.text if card else 'N/A')
                         posted_dates.append(date_element.text if date_element else 'N/A')
-                        contracts.append(contract_element.text if contract_element else 'N/A')
                         self.sleep(0.5)
                     except:
                         pass
@@ -255,7 +231,6 @@ class LinkedIn:
         if len(posted_dates)!=len(job_ids):
             posted_dates.append(posted_dates[-1])
         posted_dates_corrected = [self.change_date_format(date) for date in posted_dates]
-        contracts_corrected = [self.get_contract_type(contract) for contract in '']
         
         # output the results
         job_data = pd.DataFrame({
@@ -264,8 +239,7 @@ class LinkedIn:
             'Company': companies,
             'Location': locations,
             'Description': descriptions,
-            'Date': posted_dates_corrected,
-            'Contract': contracts_corrected
+            'Date': posted_dates_corrected
         })
         return job_data
 
