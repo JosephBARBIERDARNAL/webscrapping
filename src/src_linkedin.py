@@ -79,7 +79,7 @@ class LinkedIn:
         if try_quitting_first:
             self.close_browser()
         self.driver.get(url)
-        time.sleep(self.sec_sleep)
+        self.sleep(2)
 
         
     def accept_cookies(self):
@@ -155,10 +155,14 @@ class LinkedIn:
         """
         
         # special case when there is "reposted" in the time since posted text
-        if date_str.startswith("Reposted"):
+        if " ago" not in date_str.lower():
+            return "N/A"
+        
+        if "reposted" in date_str.lower():
             date_str = date_str.replace("Reposted ", "")
     
         # splitting the input string and change format
+        print(date_str)
         number_str, unit, _ = date_str.split()
         number = int(number_str)
         unit = unit.rstrip('s') # plural case
@@ -190,6 +194,7 @@ class LinkedIn:
         """
             
         # find all job card elements
+        self.scroll_to_bottom()
         job_cards = self.driver.find_elements(By.CLASS_NAME, 'job-card-container')
     
         # initialize lists to store job details
@@ -218,7 +223,7 @@ class LinkedIn:
                         locations.append(location_element.text if location_element else 'N/A')
                         descriptions.append(card.text if card else 'N/A')
                         posted_dates.append(date_element.text if date_element else 'N/A')
-                        self.sleep(0.5)
+                        self.sleep(1)
                     except:
                         pass
 
@@ -228,7 +233,7 @@ class LinkedIn:
     
         
         # ensure all dates are valid and change their format
-        if len(posted_dates)!=len(job_ids):
+        if len(posted_dates)!=len(job_ids) and len(posted_dates)>1:
             posted_dates.append(posted_dates[-1])
         posted_dates_corrected = [self.change_date_format(date) for date in posted_dates]
         
@@ -266,6 +271,7 @@ class LinkedIn:
                 next_page_button = self.driver.find_element(By.XPATH, next_page_xpath)
                 next_page_button.click()
                 page += 1
+                self.sleep(2)
             
             # stop scrapping and return `job_df`
             except Exception as e:
@@ -306,7 +312,7 @@ class LinkedIn:
         self.press_enter()
         
         # waiting for jobs to load
-        self.sleep(5)
+        self.sleep(3)
 
         # file name used to saved the dataframe
         file_name = f"linkedin_{keywords.replace(' ', '_')}_{location.replace(' ', '_')}"
