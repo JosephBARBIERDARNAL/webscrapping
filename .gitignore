@@ -1,5 +1,7 @@
-data/
+# credentials
 credentials.txt
+
+# cache, logs etc
 __pycache__/
 *.log
 .DS_Store
@@ -8,3 +10,10 @@ __pycache__/
 .Rhistory
 .RData
 *.Rproj
+
+# virtual environment
+/.venv/
+
+# jupyter Notebook
+*.ipynb
+!aggregate_jobs.ipynb

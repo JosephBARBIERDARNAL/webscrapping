@@ -6,7 +6,7 @@ source('src/nlp.R')
 server <- function(input, output) {
   
   # Open dataset
-  dataset <- read.csv2('../data/job_df.csv', sep = ',')
+  dataset <- read.csv2('www/linkedin.csv', sep = ',')
   dataset <- dataset %>% select(-c('Job.ID'))
 
   # Extract keywords from resume

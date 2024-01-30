@@ -1,3 +1,12 @@
+# Projet Webscrapping
+# Object : Create a dedicated class for LinkedIn jobs scraping
+# Author :
+#       - Barbier Joseph (main)
+#       - Lacoste Victor
+#       - Judic Erwan
+#       - Komla Djodji Adayeke
+
+
 # selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -28,7 +37,7 @@ class LinkedIn:
         """
         Initiate the Scraper.
         """
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Chrome()
         self.sec_sleep = sec_sleep
        
     
@@ -57,14 +66,14 @@ class LinkedIn:
         self.driver.execute_script("arguments[0].scrollTop = arguments[0].scrollHeight;", div_element)
         time.sleep(self.sec_sleep)
         
-    
-    def scroll(self, px: int=200):
+        
+    def scroll(self, px: int, css_selector: str=".jobs-search-results-list"):
         """
         Scroll a little bit down on the job page.
         It first finds the job list object and then scrolls down a little bit.
         """
-        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".jobs-search-results-list")))
-        div_element = self.driver.find_element(By.CSS_SELECTOR, ".jobs-search-results-list")
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+        div_element = self.driver.find_element(By.CSS_SELECTOR, css_selector)
         self.driver.execute_script("arguments[0].scrollIntoView(true);", div_element)
         self.driver.execute_script(f"arguments[0].scrollTop += {px};", div_element)
         time.sleep(self.sec_sleep)
@@ -194,7 +203,6 @@ class LinkedIn:
         """
             
         # find all job card elements
-        self.scroll_to_bottom()
         job_cards = self.driver.find_elements(By.CLASS_NAME, 'job-card-container')
     
         # initialize lists to store job details
@@ -207,29 +215,27 @@ class LinkedIn:
     
         # extract details from `job_cards`
         for card in job_cards:
-            try:
-                job_id = card.get_attribute('data-job-id')
-                title_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__link.job-card-list__title')
-                company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
-                location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
-                date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
+            
+            # click on card, wait and scroll to load description
+            card.click()
+            self.sleep(2)
 
-                # add elements to lists if found
-                if job_id:
-                    try:
-                        job_ids.append(job_id)
-                        job_titles.append(title_element.text if title_element else 'N/A')
-                        companies.append(company_element.text if company_element else 'N/A')
-                        locations.append(location_element.text if location_element else 'N/A')
-                        descriptions.append(card.text if card else 'N/A')
-                        posted_dates.append(date_element.text if date_element else 'N/A')
-                        self.sleep(1)
-                    except:
-                        pass
+            job_id = card.get_attribute('data-job-id')
+            title_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__link.job-card-list__title')
+            company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
+            location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
+            date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
+            descriptions_element = card.find_element(By.CSS_SELECTOR, 'div.jobs-box--fadein')
 
-            # we skip jobs that lead to stale exception
-            except:
-                pass
+            # add elements to lists if found
+            if job_id:
+                job_ids.append(job_id)
+                job_titles.append(title_element.text if title_element else 'N/A')
+                companies.append(company_element.text if company_element else 'N/A')
+                locations.append(location_element.text if location_element else 'N/A')
+                descriptions.append(descriptions_element.text if card else 'N/A')
+                posted_dates.append(date_element.text if date_element else 'N/A')
+                self.sleep(1)
     
         
         # ensure all dates are valid and change their format
