@@ -170,7 +170,6 @@ class LinkedIn:
             date_str = date_str.replace("Reposted ", "")
     
         # splitting the input string and change format
-        print(date_str)
         number_str, unit, _ = date_str.split()
         number = int(number_str)
         unit = unit.rstrip('s') # plural case
@@ -214,17 +213,12 @@ class LinkedIn:
     
         # extract details from `job_cards`
         for card in job_cards:
-            
-            # click on card, wait and scroll to load description
-            card.click()
-            self.sleep(2)
 
             job_id = card.get_attribute('data-job-id')
             title_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__link.job-card-list__title')
             company_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__primary-description')
             location_element = card.find_element(By.CSS_SELECTOR, '.job-card-container__metadata-wrapper li')
             date_element = card.find_element(By.XPATH, "//span[contains(., 'ago')]")
-            descriptions_element = card.find_element(By.CSS_SELECTOR, 'div.jobs-box--fadein')
 
             # add elements to lists if found
             if job_id:
@@ -232,7 +226,7 @@ class LinkedIn:
                 job_titles.append(title_element.text if title_element else 'N/A')
                 companies.append(company_element.text if company_element else 'N/A')
                 locations.append(location_element.text if location_element else 'N/A')
-                descriptions.append(descriptions_element.text if card else 'N/A')
+                descriptions.append(card.text if card else 'N/A')
                 posted_dates.append(date_element.text if date_element else 'N/A')
                 self.sleep(1)
     
@@ -263,6 +257,7 @@ class LinkedIn:
         """
         
         # get job infos from first page
+        self.sleep(2)
         job_df = self.get_job_details()
         
         # start with next page
