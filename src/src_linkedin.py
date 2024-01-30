@@ -14,7 +14,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
 # other
 from datetime import datetime, timedelta
 import pandas as pd
@@ -255,7 +254,7 @@ class LinkedIn:
         return job_data
 
     
-    def scrap_jobs(self, file_name: str, max_page: int=100, verbose: bool=False) -> pd.DataFrame:
+    def scrap_jobs(self, file_name: str, max_page: int=100, verbose: bool=False, save_each_time: bool=False) -> pd.DataFrame:
         """
         Starting from the first job page, iterate until max page is attained
         and get all job infos per page using previous `get_job_details()` method.
@@ -298,7 +297,8 @@ class LinkedIn:
             
             # save df at each iteration for safety
             job_df = job_df.reset_index(drop=True)
-            job_df.to_csv(f'www/{file_name}.csv', index=False)
+            if save_each_time:
+                job_df.to_csv(f'www/{file_name}.csv', index=False)
             
         print(f"Scrapping over: {len(job_df)} jobs found.")
         return job_df

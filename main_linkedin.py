@@ -46,6 +46,9 @@ southasia_jobs = scraper.get_all_jobs(location='South Asia')
 eastasia_jobs = scraper.get_all_jobs(location='East Asia')
 europe_jobs = scraper.get_all_jobs(location='European Economic Area')
 
+# close browser after scraping
+scraper.close_browser()
+
 # concat all job dataframes and save to csv
 linkedin_jobs = pd.concat([us_jobs, southasia_jobs, eastasia_jobs, europe_jobs])
 linkedin_jobs['Site'] = 'LinkedIn'
