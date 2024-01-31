@@ -11,7 +11,7 @@ from src.src_welcometothejungle import JungleScraper
 
 
 # init and load page
-keywords = "Data Science"
+keywords = "data science"
 nb_pages = 20
 jungle_scraper = JungleScraper()
 url = "https://www.welcometothejungle.com/fr"

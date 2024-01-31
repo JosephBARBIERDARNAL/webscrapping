@@ -40,7 +40,7 @@ scraper.load_page("https://www.linkedin.com/jobs/collections/recommended/")
 scraper.sleep(5)
 scraper.close_message()
 
-# get jobs from all locations
+# get jobs from all locations (default keyword is 'data science')
 us_jobs = scraper.get_all_jobs(location='United States')
 southasia_jobs = scraper.get_all_jobs(location='South Asia')
 eastasia_jobs = scraper.get_all_jobs(location='East Asia')
