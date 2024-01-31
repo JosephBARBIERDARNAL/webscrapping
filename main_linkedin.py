@@ -55,4 +55,5 @@ linkedin_jobs['Site'] = 'LinkedIn'
 linkedin_jobs['Contract'] = 'N/A'
 linkedin_jobs['Salary'] = 'N/A'
 linkedin_jobs['Sector'] = 'N/A'
+linkedin_jobs['Keyword'] = 'data science'
 linkedin_jobs.to_csv('www/linkedin.csv', index=False)

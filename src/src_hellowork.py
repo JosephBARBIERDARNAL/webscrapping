@@ -123,21 +123,21 @@ class HelloWork:
         html = response.text
         soup = BeautifulSoup(html, 'html.parser')
 
-        # Job title
+        # find the job title
         job_title_span = soup.find('span', {'class': 'tw-block tw-typo-xl sm:tw-typo-3xl tw-mb-2', 'data-cy': 'jobTitle'})
         if job_title_span is not None:
             job_title = job_title_span.text.strip()
         else:
             job_title = None
 
-        # Company name
+        # find the company name
         company_name_span = soup.find('span', {'class': 'tw-contents tw-typo-m tw-text-grey'})
         if company_name_span is not None:
             company_name = company_name_span.text.strip()
         else:
             company_name = None
 
-        # Location and job type
+        # find the location and job type
         spans = soup.find_all('span', {'class': 'tw-inline-flex tw-typo-m tw-text-grey'})
         if len(spans) >= 2:
             job_type_span = spans[1].text.strip()
@@ -146,14 +146,14 @@ class HelloWork:
             job_type_span = None
             location_span = None
 
-        # Salary
+        # find the salary
         salary_span = soup.find('li', {'class': 'tw-tag-attractive-s tw-readonly'})
         if salary_span is not None:
             salary = salary_span.text.strip().replace('\u202f', '')
         else:
             salary = None
 
-        # Publication date
+        # find the publication date
         date_span = soup.find('span', {'class': 'tw-block tw-typo-xs tw-text-grey tw-mt-3 tw-break-words'})
         if date_span is not None:
             date_text = date_span.text.strip().split(' ')
@@ -163,7 +163,7 @@ class HelloWork:
             date = None
             ref = None
 
-        # Advertisement reference
+        # find the advertisement reference
         ref_span = soup.find('span', {'class': 'tw-block tw-typo-xs tw-text-grey tw-mt-3 tw-break-words'})
         if ref_span is not None:
             ref_text = ref_span.text.strip().split(' ')
@@ -171,13 +171,9 @@ class HelloWork:
         else:
             ref = None
 
-        # Find the <p> element by its class name
+        # find the description by its class name
         paragraph_element = soup.find('p', class_='tw-typo-long-m')
-
-        # Extract text from the <p> element
         paragraph_text = paragraph_element.get_text(strip=True)
-
-        # Extract text from the <p> element
         if paragraph_element is not None:
             paragraph_text = paragraph_element.get_text(strip=True)
         else:

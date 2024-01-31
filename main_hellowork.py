@@ -26,6 +26,7 @@ job_data = scraper.scrape_jobs(nb_pages=2)
 job_data['Site'] = 'HelloWork'
 job_data['Duration'] = 'N/A'
 job_data['Sector'] = 'N/A'
+job_data['Keyword'] = keywords
 job_data.to_csv('www/hellowork.csv', index=False)
 
 # close browser 
