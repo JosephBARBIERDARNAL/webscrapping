@@ -20,17 +20,10 @@ a:hover {
 }
 
 /* Tabs */
-.tabs {
-  background-color: #f23838; /* background color */
+ul.nav.navbar-nav {
   color: #000000; /* text color */
   padding: 10px; /* Add some padding for aesthetics */
-}
-
-/* Tabs hover */
-.tabs:hover {
-  background-color: #fca43f; /* background color */
-  color: #000000; /* text color */
-  padding: 10px; /* Add some padding for aesthetics */
+  padding-top: 10px;
 }
 
 /* HomePage container */
@@ -68,7 +61,6 @@ a:hover {
 .sidebar .sidebar-content {
   color: #000000; /* Light text color */
   padding: 20px; /* Add some padding for aesthetics */
-  margin-top: 20px; /* Add some margin for aesthetics */
   font-size: 16px; /* Larger font size for the sidebar */
 }
 
@@ -76,7 +68,7 @@ a:hover {
 .sidebar :not(.main) {
   background-color: #fbf3e4; /* Example: a soft green background */
   color: #000000; /* Text color */
-  padding: 3px; /* Add some padding for aesthetics */
+  padding: 2px; /* Add some padding for aesthetics */
 }
 
 /* Sidebar input field */

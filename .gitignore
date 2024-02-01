@@ -10,6 +10,9 @@ __pycache__/
 .Rhistory
 .RData
 *.Rproj
+sujet.pdf
+thesis.Rmd
+*.R
 
 # virtual environment
 /.venv/
