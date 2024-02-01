@@ -19,4 +19,3 @@ thesis.Rmd
 
 # jupyter notebook
 *.ipynb
-!aggregate_jobs.ipynb
