@@ -26,5 +26,5 @@ df = pd.DataFrame(data)
 print(f"Scrapping over: {len(df)} jobs found.")
 
 # save data to csv
-df.to_csv("www/welcometothejungle.csv", index=False)
+#df.to_csv("www/welcometothejungle.csv", index=False)
 jungle_scraper.close_driver()

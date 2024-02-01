@@ -36,7 +36,6 @@ class JungleScraper:
         Initializes the Firefox webdriver
         """
         self.driver = webdriver.Firefox()
-        print("JungleScraper initialized")
 
 
     def accept_cookies(self):

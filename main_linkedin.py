@@ -56,5 +56,5 @@ linkedin_jobs['Contract'] = 'N/A'
 linkedin_jobs['Salary'] = 'N/A'
 linkedin_jobs['Sector'] = 'N/A'
 linkedin_jobs['Keyword'] = 'data science'
-linkedin_jobs['Url'] = linkedin_jobs['Job ID'].apply(lambda x: 'https://www.linkedin.com/jobid='+x)
-linkedin_jobs.to_csv('www/linkedin.csv', index=False)
+linkedin_jobs['Url'] = linkedin_jobs['Job ID'].apply(lambda x: 'https://www.linkedin.com/jobs/collections/recommended/?currentJobId='+x)
+#linkedin_jobs.to_csv('www/linkedin.csv', index=False)
