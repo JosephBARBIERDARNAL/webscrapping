@@ -1,21 +1,22 @@
 # credentials
 credentials.txt
+apikey.txt
 
 # cache, logs etc
 __pycache__/
 *.log
 .DS_Store
-.ipynb_checkpoints/
 .Rproj.user
 .Rhistory
 .RData
 *.Rproj
 sujet.pdf
+cv_test.pdf
 thesis.Rmd
-*.R
 
 # virtual environment
 /.venv/
 
 # jupyter notebook
 *.ipynb
+.ipynb_checkpoints/
