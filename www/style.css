@@ -113,6 +113,10 @@ ul.nav.navbar-nav {
 
 
 
+#descriptionContainer {
+  font-size: medium;
+}
+
 
 /* copy cover letter button */
 .copy-container{
@@ -126,18 +130,49 @@ ul.nav.navbar-nav {
   bottom: 1px;
   right: 1px;
   font-size: medium;
+  background-color: #4d4d44;
+  color: #fefefe;
+  transition: 0.2s ease-in-out;
+}
+.copy-btn:hover {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  font-size: medium;
+  background-color: #fefefe;
+  color: #4d4d44;
 }
 
-#descriptionContainer {
-  font-size: medium;
-}
+
 #toggle_desc {
   font-size: medium;
-  margin-left: 5px;
+  margin-left: 1px;
   margin-bottom: 10px;
   padding: 8px;
   background-color: #4d4d44;
   color: #fefefe;
+  transition: 0.2s ease-in-out;
+}
+#toggle_desc:hover {
+  font-size: medium;
+  margin-left: 1px;
+  margin-bottom: 10px;
+  padding: 8px;
+  background-color: #fefefe;
+  color: #4d4d44;
+}
+#generate_cover_letter_modal {
+  font-size: medium;
+  padding: 8px;
+  background-color: #155dc2;
+  color: #fefefe;
+  transition: 0.2s ease-in-out;
+}
+#generate_cover_letter_modal:hover {
+  font-size: medium;
+  padding: 8px;
+  background-color: #fefefe;
+  color: #155dc2;
 }
 
 
