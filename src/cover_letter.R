@@ -4,9 +4,9 @@ library(jsonlite)
 GPT = function(
     prompt,
     modelName = "gpt-3.5-turbo",
-    temperature = 0.2,
-    apiKey = readLines("../apikey.txt")) {
+    temperature = 0.2) {
   
+  apiKey = readLines("apikey.txt", n=1, warn=FALSE)
   response = POST(
     url = "https://api.openai.com/v1/chat/completions", 
     add_headers(Authorization = paste("Bearer", apiKey)),

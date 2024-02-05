@@ -42,7 +42,8 @@ df['Sector'] = 'N/A'
 df['Keyword'] = keyword
 
 # keep only those offers for which we have been able to extract all attributes
-df_final = df[df['Title'] != 'Error']
+df = df[df['Title'] != 'Error']
+df = df[df['Date'] != 'Error']
 
 # save results to csv
-#df_final.to_csv('www/jobteaser.csv', index=False)
+#df.to_csv('www/jobteaser.csv', index=False)

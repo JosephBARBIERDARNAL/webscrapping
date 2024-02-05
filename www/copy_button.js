@@ -9,7 +9,7 @@ function copyToClipboard() {
     
     // change back after 2 seconds
     setTimeout(function() {
-      document.getElementById('copyBtn').innerText = 'Copy';
+      document.getElementById('copyBtn').innerText = 'Copy the text';
     }, 2000);
 
   // log error

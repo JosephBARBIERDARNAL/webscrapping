@@ -1,3 +1,5 @@
+
+
 library(shiny)
 library(shinyjs)
 source('src/improve_ui.R')
@@ -5,8 +7,8 @@ source('src/improve_ui.R')
 ui = navbarPage("Job Recommendation System",
   
   # include CSS and JS 
-  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
-  tags$script(src = "copy_button.js"),
+  tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
+            tags$script(src = "copy_button.js")),
   
   # enable shiny JS
   shinyjs::useShinyjs(),
@@ -57,13 +59,6 @@ ui = navbarPage("Job Recommendation System",
           h2("Best job matches:"),
           add_space(1),
           div(class = "job-table", dataTableOutput("table")),
-          add_space(3),
-          div(class = "copy-container",
-              div(id = "spinner", class = "spinner hidden"),
-              actionButton("generate_cover_letter", "Generate Cover Letter", class = "btn-primary"),
-              add_space(1),
-              actionButton("copyBtn", label = "Copy", class = "copy-btn", onclick = "copyToClipboard()"),
-              verbatimTextOutput("coverLetterDisplay", placeholder = TRUE)),
           add_space(10)
         )
       )

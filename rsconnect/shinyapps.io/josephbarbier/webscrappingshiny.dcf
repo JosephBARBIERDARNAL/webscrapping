@@ -1,0 +1,10 @@
+name: webscrappingshiny
+title:
+username: josephbarbier
+account: josephbarbier
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11124737
+bundleId: 8216696
+url: https://josephbarbier.shinyapps.io/webscrappingshiny/
+version: 1

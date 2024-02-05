@@ -62,6 +62,9 @@ ul.nav.navbar-nav {
   overflow-x: auto;
   text-align: left;
   border-radius: 5px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #ffffff;
 }
 .clickable-row {
   cursor: pointer;
@@ -74,17 +77,18 @@ ul.nav.navbar-nav {
   font-size: 16px; 
 }
 .sidebar :not(.main) {
-  background-color: #e9e8d3; 
-  color: #000000; 
+  background-color: #4d4d44; 
+  color: #ffffff; 
 }
 .sidebar-content input[type="text"] {
-  background-color: #000000; 
-  color: #ffffff; 
+  background-color: #ffffff; 
+  color: #000000; 
   font-size: large; 
   padding: 5px; 
 }
 .resume-upload {
   margin: 5px;
+  margin-top: 25px;
   padding: 10px;
   border-radius: 5px;
   border-style: solid;
@@ -103,7 +107,7 @@ ul.nav.navbar-nav {
 .col-sm-3 {
   border-radius: 5px;
   border-style: solid;
-  border-width: 5px;
+  border-width: 2px;
   margin-left:10px;
 }
 
@@ -111,33 +115,43 @@ ul.nav.navbar-nav {
 
 
 /* copy cover letter button */
-.copy-container {
+.copy-container{
   position: relative;
-  display: inline-block;
+  margin: 10px;
+  margin-top: 35px;
+  padding: 5px;
 }
 .copy-btn {
   position: absolute;
-  top: 1px;
-  left: 200px;
-  z-index: 10;
+  bottom: 1px;
+  right: 1px;
+  font-size: medium;
 }
 
+
+
 /* display of the cover letter */
+.btn-primary {
+  font-size: medium;
+}
 pre {
   white-space: pre-wrap;
   word-break: break-word;
   padding: 12px;
   margin: 5px;
   color: white;
-  font-size: 18px;
-  background-color: #444d4b;
+  font-size: 14px;
+  background-color: #4d4d44;
+  font-family: "Gill Sans", sans-seri;
+  text-align: justify;
 }
+
 
 
 /* work in progress spinner */
 .spinner {
   border: 16px solid #f3f3f3;
-  border-top: 16px solid #f23838;
+  border-top: 16px solid #76d863;
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -162,4 +176,36 @@ pre {
  font-size: 18px; 
  margin-left: 20px;
  font-style: italic;
+}
+
+
+
+/* pop up modal */
+.modal-content {
+  background-color: #fefefe;
+  color: #000000;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 120%;
+  margin-top: 100px;
+}
+div.modal-header {
+  background-color: #4d4d44;
+  color: #fefefe;
+  padding: 15px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 5px;
+  border-style: solid;
+  border-width: 2px;
+}
+div.modal-title {
+  margin-bottom: 10px;
+}
+div.modal-body {
+  padding: 10px;
+  font-size: 16px;
+  font-style: justify;
 }

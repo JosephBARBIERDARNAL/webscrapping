@@ -95,6 +95,18 @@ class HelloWork:
         self.driver.execute_script(f"window.scrollBy(0, {px});")
         self.sleep(1)
 
+
+    def change_page(self):
+
+        xpath_expression = '//li[@class="next"]'
+
+        element = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, xpath_expression))
+        )
+
+        element.click()
+        time.sleep(2)
+
         
     def get_job_links(self) -> list:
         """
@@ -191,7 +203,8 @@ class HelloWork:
         all_links = []
         for _ in range(nb_pages):
             all_links.extend(self.get_job_links())
-            self.scroll(500) 
+            self.change_page()
+            #self.scroll(500) 
             
         # iterate over the links to get the job info
         job_data = []
@@ -200,6 +213,7 @@ class HelloWork:
 
         df = pd.DataFrame(job_data)
         df.columns = ['Title', 'Company', 'Salary', 'Location', 'Description', 'Date', 'Contract', 'Job ID']
+        df['Url'] = all_links
         print(f"Scrapping over: {len(df)} jobs found.")
         return df
 

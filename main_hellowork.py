@@ -22,12 +22,16 @@ keywords = "data science"
 scraper.search_for_jobs(keywords)
 
 # get jobs and save them as a csv file
-job_data = scraper.scrape_jobs(nb_pages=2)
+job_data = scraper.scrape_jobs(nb_pages=50)
 job_data['Site'] = 'HelloWork'
 job_data['Duration'] = 'N/A'
 job_data['Sector'] = 'N/A'
 job_data['Keyword'] = keywords
-#job_data.to_csv('www/hellowork.csv', index=False)
+
+# change date format
+job_data['Date'] = pd.to_datetime(job_data['Date'], format='%d/%m/%Y').dt.strftime('%Y/%m/%d')
+
+job_data.to_csv('www/hellowork.csv', index=False)
 
 # close browser 
 scraper.close_browser()

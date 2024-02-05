@@ -105,7 +105,7 @@ class JobTeaser:
         setlocale(LC_TIME, 'fr_FR.UTF-8')
         date_string = string.replace("Publiée le ", "")
         date_object = datetime.strptime(date_string, "%d %B %Y")
-        formatted_date = date_object.strftime("%Y/%d/%m")
+        formatted_date = date_object.strftime("%Y/%m/%d")
         return formatted_date
 
 

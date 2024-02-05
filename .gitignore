@@ -16,6 +16,7 @@ thesis.Rmd
 
 # virtual environment
 /.venv/
+/venv/
 
 # jupyter notebook
 *.ipynb

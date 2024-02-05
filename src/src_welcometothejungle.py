@@ -152,7 +152,7 @@ class JungleScraper:
         sector = sector_text if sector_text else None
 
         apply_url_elements = self.driver.find_elements(By.XPATH, "//a[@class ='sc-gvZAcH iNpPnN']")
-        url = apply_url_elements[0].get_attribute("href") if apply_url_elements else None
+        url = apply_url_elements[0].get_attribute("href") if apply_url_elements else url
 
         date_elements = self.driver.find_elements(By.XPATH, "//div[@class ='sc-bXCLTC dPVkkc']//time")
         date_str = date_elements[0].get_attribute("datetime") if date_elements else None
