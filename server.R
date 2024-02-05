@@ -72,7 +72,8 @@ server = function(input, output) {
       br(), br(),
       
       # display description
-      'Description:', br(), row_data$Description,
+      actionButton("toggle_desc", "Display Description", class = "btn-primary"),
+      div(id = "job_description", style = "display: none;", row_data$Description),
       br(), br(),
       
       # display salary
@@ -90,6 +91,20 @@ server = function(input, output) {
   })
   
   
+  
+  
+  # TOGGLE DESCRIPTION
+  observeEvent(input$toggle_desc, {
+    shinyjs::runjs('
+    if ($("#toggle_desc").text() === "Display Description") {
+      $("#toggle_desc").text("Hide Description");
+      $("#job_description").show();
+    } else {
+      $("#toggle_desc").text("Display Description");
+      $("#job_description").hide();
+    }
+  ')
+  })
   
   
   # DEFINE TABLE TO RENDER
