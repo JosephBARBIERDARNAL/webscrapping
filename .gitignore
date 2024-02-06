@@ -6,10 +6,10 @@ apikey.txt
 __pycache__/
 *.log
 .DS_Store
-.Rproj.user
 .Rhistory
 .RData
-*.Rproj
+.Rproj.user/
+rsconnect/
 sujet.pdf
 cv_test.pdf
 thesis.Rmd

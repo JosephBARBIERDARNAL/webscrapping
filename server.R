@@ -4,20 +4,19 @@ library(DT)
 library(dplyr)
 library(pdftools)
 source('src/nlp.R')
-source('src/improve_ui.R')
 source('src/cover_letter.R')
+source('src/dynamic_sort.R')
+
+
 
 server = function(input, output) {
-  
-  
-  
   
   # OPEN AND CLEAN DATASET
   dataset = read.csv2('www/all_jobs.csv', sep = ',')
   dataset$title = dataset$Title
   dataset$Title = sprintf('<a href="%s" target="_blank">%s</a>', dataset$Url, dataset$title)
-  dataset = dataset %>% select(-c(Keyword, Site, Url))
-  sampled_rows = sample(nrow(dataset), 10)
+  dataset = dataset %>% select(-c(Keyword, Site))
+  sampled_rows = sample(nrow(dataset), 100)
   dataset = dataset[sampled_rows, ]
 
   
@@ -46,19 +45,8 @@ server = function(input, output) {
   # POP UP WINDOW
   observeEvent(input$table_rows_selected, {
     
-    ##############################################################################################################
-    # re-filter dataset 
-    keywordInput <- input$keyword
-    resumeKeywords <- resumeKeywords()
-    allKeywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
-    filtered_data = dataset %>%
-      filter(sapply(tolower(Description), function(description) all(sapply(keywordInput, function(keyword) grepl(keyword, description)))))
-    filtered_data$keywordMatchCount = apply(filtered_data, 1, function(row) keywordCount(tolower(row), allKeywords))
-    sorted_data = filtered_data[order(-filtered_data$keywordMatchCount), ]
-    ##############################################################################################################
-    
     # select row
-    dataset_filtered = sorted_data %>% select(-c(Job.ID))
+    dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
     row_data = dataset_filtered[input$table_rows_selected, ]
     
     # empty cover letter at first
@@ -66,14 +54,18 @@ server = function(input, output) {
      
     showModal(modalDialog(
       title = paste0(row_data$title, ' at ', row_data$Company),
-      
-      # display location
-      'Location:', br(), row_data$Location,
+
+      # clickable link to job offer
+      HTML(paste0('<a href="', row_data$Url, '" target="_blank">Link to job offer</a>')),
       br(), br(),
-      
+
       # display description
       actionButton("toggle_desc", "Display Description", class = "btn-primary"),
       div(id = "job_description", style = "display: none;", row_data$Description),
+      br(), br(),
+      
+      # display location
+      'Location:', br(), row_data$Location,
       br(), br(),
       
       # display salary
@@ -93,7 +85,7 @@ server = function(input, output) {
   
   
   
-  # TOGGLE DESCRIPTION
+  # TOGGLE DESCRIPTION HIDE/DISPLAY
   observeEvent(input$toggle_desc, {
     shinyjs::runjs('
     if ($("#toggle_desc").text() === "Display Description") {
@@ -107,22 +99,13 @@ server = function(input, output) {
   })
   
   
+  
   # DEFINE TABLE TO RENDER
   output$table <- renderDT({
-    keywordInput <- input$keyword
-    resumeKeywords <- resumeKeywords()
-    allKeywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
 
-    # filter dataset to include rows containing all keywords in the Description
-    filtered_data = dataset %>%
-      filter(sapply(tolower(Description), function(description) all(sapply(keywordInput, function(keyword) grepl(keyword, description)))))
-
-    # count and sort data based on keyword matches
-    filtered_data$keywordMatchCount = apply(filtered_data, 1, function(row) keywordCount(tolower(row), allKeywords))
-    sorted_data = filtered_data[order(-filtered_data$keywordMatchCount), ]
-
-    # display data 
-    table_to_display = sorted_data %>% select(-c(Job.ID, keywordMatchCount, Description, title))
+    # filter and sort data
+    dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
+    table_to_display = dataset_filtered %>% select(-c(Job.ID, keywordMatchCount, Description, title, Url))
 
     # display the DT table
     return(DT::datatable(
@@ -140,10 +123,9 @@ server = function(input, output) {
                          list(width = '120px', targets = 3), 
                          list(width = '100px', targets = 4)), 
                        autoWidth = TRUE),
-        filter="top",
         class="cell-border stripe hover",
         selection="single",
-        escape=FALSE) #%>% formatStyle(columns = c('Title'), `cursor` = 'pointer')
+        escape=FALSE)
       )
   })
   
@@ -161,19 +143,9 @@ server = function(input, output) {
       # start spinner
       shinyjs::runjs('$("#spinner").removeClass("hidden");')
       
-      
-      ##############################################################################################################
-      keywordInput <- input$keyword
-      resumeKeywords <- resumeKeywords()
-      allKeywords <- unique(c(unlist(strsplit(tolower(keywordInput), " ")), resumeKeywords))
-      filtered_data = dataset %>%
-        filter(sapply(tolower(Description), function(description) all(sapply(keywordInput, function(keyword) grepl(keyword, description)))))
-      filtered_data$keywordMatchCount = apply(filtered_data, 1, function(row) keywordCount(tolower(row), allKeywords))
-      sorted_data = filtered_data[order(-filtered_data$keywordMatchCount), ]
-      ##############################################################################################################
-      
-      # select row
-      dataset_filtered = sorted_data %>% select(-c(Job.ID))
+      # filter and sort data
+      dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
+      dataset_filtered = dataset_filtered %>% select(-c(Job.ID))
       jobDescription = dataset_filtered[input$table_rows_selected, ]$Description
       
       # extract the path to the uploaded resume

@@ -10,12 +10,12 @@ body {
 
 /* Links */
 a {
-  color: #fca43f; /* Light text color */
+  color: #e8973b; /* Light text color */
   text-decoration: none; /* Remove underline */
   transition: color 0.3s ease-in-out; /* Add transition for hover effects */
 }
 a:hover {
-  color: #f23838; /* Dark text color */
+  color: #e33434; /* Dark text color */
   text-decoration: none; /* Remove underline */
 }
 
@@ -132,7 +132,8 @@ ul.nav.navbar-nav {
   font-size: medium;
   background-color: #4d4d44;
   color: #fefefe;
-  transition: 0.2s ease-in-out;
+  transition: 0.3s ease-in-out;
+  font-size: 14px;
 }
 .copy-btn:hover {
   position: absolute;
@@ -141,35 +142,35 @@ ul.nav.navbar-nav {
   font-size: medium;
   background-color: #fefefe;
   color: #4d4d44;
+  font-size: 16px;
 }
 
 
 #toggle_desc {
-  font-size: medium;
-  margin-left: 1px;
+  font-size: 14px;
+
   margin-bottom: 10px;
-  padding: 8px;
+  padding: 5px;
   background-color: #4d4d44;
   color: #fefefe;
-  transition: 0.2s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 #toggle_desc:hover {
-  font-size: medium;
-  margin-left: 1px;
+  font-size: 16px;
   margin-bottom: 10px;
-  padding: 8px;
+  padding: 5px;
   background-color: #fefefe;
   color: #4d4d44;
 }
 #generate_cover_letter_modal {
-  font-size: medium;
+  font-size: 14px;
   padding: 8px;
   background-color: #155dc2;
   color: #fefefe;
-  transition: 0.2s ease-in-out;
+  transition: 0.3s ease-in-out;
 }
 #generate_cover_letter_modal:hover {
-  font-size: medium;
+  font-size: 16px;
   padding: 8px;
   background-color: #fefefe;
   color: #155dc2;
