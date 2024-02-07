@@ -44,23 +44,32 @@ ui = fluidPage(
       sidebarLayout(
         div(class = "sidebar", 
           sidebarPanel(width=3,
-            div(class = "sidebar-content",  
-              div(class = "resume-upload", fileInput("resume", "Upload your resume (PDF only)", accept = ".pdf")),
-              div(class = "keyword-input", textInput("keyword", "Enter keyword(s) (separated by space):", value = "")),
-              div(class = "keywords-search-output", uiOutput("keywordsSearch"))
+            div(class = "sidebar-content",
+                div(id = "spinner", class = "spinner hidden", ""),
+                div(class = "resume-upload",
+                    fileInput("resume", "Upload your resume (PDF only)",
+                              accept = ".pdf")),
+                div(class = "language-selector",
+                    radioButtons("language",
+                               "Language of your Resume:",
+                               choices = c("Français" = "fr", "English" = "en"),
+                               selected = "fr")),
+                div(class = "keyword-input",
+                    textInput("keyword", "Enter keyword(s) (separated by space):",
+                            value = "")),
+                div(class = "keywords-search-output",
+                    uiOutput("keywordsSearch")),
+                actionButton("search_jobs", "Search for Jobs", class = "btn-primary")
             )
           )
         ),
           
         div(class = "main",
           mainPanel(width=8,
-            h2("Extracted Keywords:"),
+            uiOutput("keywordsUI"),
+            add_space(2), 
+            uiOutput("matchesUI"),
             add_space(1),
-            div(class = "keywords-display-output", uiOutput("keywordsDisplay")),
-            add_space(3), 
-            h2("Best job matches:"),
-            add_space(1),
-            div(class = "job-table", dataTableOutput("table")),
             add_space(10)
           )
         )

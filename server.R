@@ -9,78 +9,87 @@ source('src/dynamic_sort.R')
 
 
 
-server = function(input, output) {
+server = function(input, output, session) {
+
+  options(shinyjs.debug = TRUE)
   
   # OPEN AND CLEAN DATASET
   dataset = read.csv2('www/all_jobs.csv', sep = ',')
   dataset$title = dataset$Title
   dataset$Title = sprintf('<a href="%s" target="_blank">%s</a>', dataset$Url, dataset$title)
   dataset = dataset %>% select(-c(Keyword, Site))
-  sampled_rows = sample(nrow(dataset), 100)
-  dataset = dataset[sampled_rows, ]
+  n = 100
+  dataset = dataset[sample(nrow(dataset), n), ]
 
   
-  
+
+
+  resumeKeywords <- reactiveVal()
+  inputKeywords <- reactiveVal()
+
+
+  # LANGUAGE SELECTION (RADIO BUTTON)
+  observe({
+    if (input$language == "fr") {
+      updateSelectInput(session, "keywordSelect", 
+                        choices = removeStopwords(resumeKeywords(), "fr"), 
+                        selected = removeStopwords(resumeKeywords(), "fr"))
+    } else {
+      updateSelectInput(session, "keywordSelect", 
+                        choices = removeStopwords(resumeKeywords(), "en"), 
+                        selected = removeStopwords(resumeKeywords(), "en"))
+    }    
+  })
+
+
+
+   
+
+
   
   # FIND KEYWORDS IN RESUME
-  resumeKeywords = reactive({
+  resumeKeywords <- reactive({
     req(input$resume)
-    resume = pdf_text(input$resume$datapath)
-    extractKeywords(resume)
+    resume <- pdf_text(input$resume$datapath)
+    keywords <- extractKeywords(resume)
+    keywords <- removeStopwords(keywords, input$language)
+    return(keywords)
+  })  
+  # FIND KEYWORDS FROM USER INPUT
+  inputKeywords  <- reactive({
+  if(is.null(input$keyword) || input$keyword == ""){
+    return(character(0))
+  } else {
+    return(unlist(strsplit(tolower(input$keyword), " ", fixed = TRUE)))
+  }
   })
-  # DISPLAY KEYWORDS FOUND IN RESUME
-  output$keywordsDisplay <- renderUI({
-    keywords <- resumeKeywords()
-    if (is.null(keywords)) {
-      return("No keywords extracted or resume not uploaded.")
-    } else {
-      keywords <- removeStopwords(keywords, language = "fr")
-      return(paste(keywords, collapse = ", "))
-    }
+  # UPDATE SELECT INPUT
+  observe({
+    keywords_resume <- resumeKeywords()
+    keywords_input <- inputKeywords()
+    keywords <- unique(c(keywords_resume, keywords_input))
+    keywords <- removeStopwords(keywords, input$language)
+    updateSelectInput(session, "keywordSelect", 
+                      choices = keywords, 
+                      selected = keywords)
   })
   
-  
-  
-  
-  # POP UP WINDOW
-  observeEvent(input$table_rows_selected, {
-    
-    # select row
-    dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
-    row_data = dataset_filtered[input$table_rows_selected, ]
-    
-    # empty cover letter at first
-    output$coverLetterDisplay = renderText(NULL)
-     
-    showModal(modalDialog(
-      title = paste0(row_data$title, ' at ', row_data$Company),
-
-      # clickable link to job offer
-      HTML(paste0('<a href="', row_data$Url, '" target="_blank">Link to job offer</a>')),
-      br(), br(),
-
-      # display description
-      actionButton("toggle_desc", "Display Description", class = "btn-primary"),
-      div(id = "job_description", style = "display: none;", row_data$Description),
-      br(), br(),
-      
-      # display location
-      'Location:', br(), row_data$Location,
-      br(), br(),
-      
-      # display salary
-      'Salary:', br(), display_salary(row_data$Salary),
-      br(), br(),
-
-      footer = tagList(
-        div(id = "spinner", class = "spinner hidden"),
-        actionButton("generate_cover_letter_modal", "Generate Cover Letter For This Job", class = "btn-primary"),
-        verbatimTextOutput("coverLetterDisplay", placeholder = TRUE),
-        div(class = "copy-container", actionButton("copyBtn", label = "Copy the text", class = "copy-btn", onclick = "copyToClipboard()")),
-      ),
-      easyClose = TRUE
-    ))
+  combinedKeywords <- reactive({
+    c(resumeKeywords(), inputKeywords()) %>%
+      unique() %>%
+      removeStopwords(input$language)
   })
+
+  observeEvent(input$search_jobs, {
+    shinyjs::runjs('$("#spinner").removeClass("hidden");')
+    updateSelectInput(session, "keywordSelect", choices = combinedKeywords(), selected = combinedKeywords())
+  })
+
+  dataset_filtered <- reactive({
+    req(combinedKeywords())
+    filter_and_sort(dataset, combinedKeywords())
+  })
+  
   
   
   
@@ -97,15 +106,47 @@ server = function(input, output) {
     }
   ')
   })
+
+
+
+
+  output$keywordsUI <- renderUI({
+    if (!is.null(input$resume)) {
+      fluidRow(
+        div(class = "main",
+        includeCSS("www/style.css"),
+        h2("Keywords From Your Resume:"),
+        selectInput("keywordSelect", "", choices = NULL, multiple = TRUE)
+      ))
+    }
+  })
+  output$matchesUI <- renderUI({
+    req(input$search_jobs)
+    if (!is.null(input$resume)) {
+      fluidRow(
+        div(class = "main",
+        includeCSS("www/style.css"),
+        h2("Best Job Matches:"),
+        div(class = "job-table", dataTableOutput("table"))
+      ))
+    }
+  })
+
+
   
   
   
   # DEFINE TABLE TO RENDER
   output$table <- renderDT({
 
+    req(input$search_jobs)
     # filter and sort data
-    dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
+    dataset_filtered = filter_and_sort(dataset, combinedKeywords())
     table_to_display = dataset_filtered %>% select(-c(Job.ID, keywordMatchCount, Description, title, Url))
+    
+    # keep first n rows
+    table_to_display = table_to_display[1:n, ]
+    shinyjs::runjs('$("#spinner").addClass("hidden");')
 
     # display the DT table
     return(DT::datatable(
@@ -136,15 +177,15 @@ server = function(input, output) {
   
   # GENERATE COVER LETTER WITH GPT
   observeEvent(input$generate_cover_letter_modal, {
-    
+
     # ensure there's a selected job and a resume uploaded
     if (!is.null(input$resume) && !is.null(input$table_rows_selected)) {
-      
-      # start spinner
+
+      # show spinner while operation is running
       shinyjs::runjs('$("#spinner").removeClass("hidden");')
-      
+
       # filter and sort data
-      dataset_filtered = filter_and_sort(dataset, input$keyword, resumeKeywords())
+      dataset_filtered = filter_and_sort(dataset, combinedKeywords())
       dataset_filtered = dataset_filtered %>% select(-c(Job.ID))
       jobDescription = dataset_filtered[input$table_rows_selected, ]$Description
       
@@ -173,4 +214,64 @@ server = function(input, output) {
       )
     }
   })
+
+
+
+
+
+
+
+
+  # POP UP WINDOW
+  observeEvent(input$table_rows_selected, {
+    
+    # select row
+    dataset_filtered = filter_and_sort(dataset, combinedKeywords())
+    row_data = dataset_filtered[input$table_rows_selected, ]
+    
+    # empty cover letter at first
+    output$coverLetterDisplay = renderText(NULL)
+
+    # display description with line breaks
+    description_with_br = gsub("\n", "<br>", HTML(row_data$Description))
+     
+    showModal(modalDialog(
+      title = paste0(row_data$title, ' at ', row_data$Company),
+
+      # display description
+      actionButton("toggle_desc", "Display Description", class = "btn-primary"),
+      div(id = "job_description", style = "display: none;", description_with_br),
+      br(), br(),
+      
+      # display location
+      'Location:', br(), row_data$Location,
+      br(), br(),
+      
+      # display salary
+      'Salary:', br(), display_salary(row_data$Salary),
+      br(), br(),
+
+      # display apply button
+      div(class = "apply-button-container", actionButton("apply_job", "Apply for this Job", class = "btn-primary")),
+        tags$script(HTML(paste0("$('#apply_job').on('click', function() {
+          window.open('", row_data$Url, "', '_blank');});"))),
+
+      footer = tagList(
+        div(id = "spinner",
+            class = "spinner hidden",
+            actionButton("generate_cover_letter_modal",
+                        "Generate Cover Letter for this Job",
+                        class = "btn-primary")),
+        verbatimTextOutput("coverLetterDisplay", placeholder = TRUE),
+        div(class = "copy-container", actionButton("copyBtn", label = "Copy the text", class = "copy-btn", onclick = "copyToClipboard()")),
+      ),
+      easyClose = TRUE
+    ))
+  })
+  
 }
+
+
+
+
+
