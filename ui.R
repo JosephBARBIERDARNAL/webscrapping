@@ -24,8 +24,7 @@ ui = fluidPage(
         div(class = "home-description",
           h2("About"),
           p("This system helps you find job opportunities based on your resume and keywords. 
-            Upload your resume and enter relevant keywords to discover job matches."),
-          p("The system will extract keywords from your resume and search for jobs that match those keywords."),
+            Upload your CV and enter relevant keywords to discover matching job offers and apply quickly and easily."),
           p("This project was realized by Lacoste Victor, Judic Erwan, Joseph Barbier and Komla Djodji Adayeke. You can
           find the source code on this ", a("GitHub repo", href="https://github.com/JosephBARBIERDARNAL/webscrapping",
           target="_blank") ,"."),
@@ -34,7 +33,8 @@ ui = fluidPage(
           p("By uploading a CV, the system returns the job offers that match you best. The algorithm in the background
             locates the most important words in your CV and sorts the offers whose description has the highest number of words in common."),
           p("What's more, it's also possible to automatically generate a cover letter for the job offer of your choice,
-            totally individualized. This is powered by the OpenAI API and their GPT-3.5-turbo. As there are no dedicated tools with R for this type of use, we make the HTTP request ourselves to access the API and retrieve the model response. ")
+            totally individualized. This is powered by the OpenAI API and their GPT-3.5-turbo. As there are no dedicated tools with R for
+            this type of use, we make the HTTP request ourselves to access the API and retrieve the model response.")
           )
         ) 
       ),
@@ -66,7 +66,8 @@ ui = fluidPage(
           
         div(class = "main",
           mainPanel(width=8,
-                    h2("Keywords From Your Resume:"),
+                    div(id = "spinner", class = "spinner hidden", ""),
+                    h2("Keywords:"),
                     add_space(1),
                     selectInput("keywordSelect", "",
                                 choices = NULL, 

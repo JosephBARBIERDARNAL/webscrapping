@@ -5,7 +5,7 @@ extractKeywords = function(resume) {
   words = tolower(words[words != ""])
   words = words[!grepl("[0-9]", words)]
   freq = sort(table(words), decreasing = TRUE)
-  keywords = names(freq[freq >= 2])
+  keywords = names(freq[freq >= 3])
   return(keywords)
 }
 

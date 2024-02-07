@@ -4,7 +4,7 @@ filter_and_sort = function(dataset, allKeywords) {
   
   # function to count keyword matches in a row
   keywordCount = function(row, keywords) {
-    sum(sapply(keywords, function(keyword) grepl(keyword, tolower(row[["Description"]]))))
+    sum(sapply(keywords, function(keyword) grepl(keyword, tolower(paste(row[["Description"]], row[["Title"]])))))
   }
 
   # apply keyword match counting and sort
