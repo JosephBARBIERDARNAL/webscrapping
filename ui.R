@@ -66,11 +66,16 @@ ui = fluidPage(
           
         div(class = "main",
           mainPanel(width=8,
-            uiOutput("keywordsUI"),
-            add_space(2), 
-            uiOutput("matchesUI"),
-            add_space(1),
-            add_space(10)
+                    h2("Keywords From Your Resume:"),
+                    add_space(1),
+                    selectInput("keywordSelect", "",
+                                choices = NULL, 
+                                multiple = TRUE),
+                    add_space(3), 
+                    h2("Best Job Matches:"),
+                    add_space(1),
+                    div(class = "job-table", dataTableOutput("table")),
+                    add_space(10)
           )
         )
       )

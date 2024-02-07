@@ -110,25 +110,20 @@ server = function(input, output, session) {
 
 
 
-  output$keywordsUI <- renderUI({
-    if (!is.null(input$resume)) {
-      fluidRow(
-        div(class = "main",
-        includeCSS("www/style.css"),
-        h2("Keywords From Your Resume:"),
-        selectInput("keywordSelect", "", choices = NULL, multiple = TRUE)
-      ))
-    }
+  # FIND KEYWORDS IN RESUME
+  resumeKeywords = reactive({
+    req(input$resume)
+    resume = pdf_text(input$resume$datapath)
+    extractKeywords(resume)
   })
-  output$matchesUI <- renderUI({
-    req(input$search_jobs)
-    if (!is.null(input$resume)) {
-      fluidRow(
-        div(class = "main",
-        includeCSS("www/style.css"),
-        h2("Best Job Matches:"),
-        div(class = "job-table", dataTableOutput("table"))
-      ))
+  # DISPLAY KEYWORDS FOUND IN RESUME
+  output$keywordsDisplay <- renderUI({
+    keywords <- resumeKeywords()
+    if (is.null(keywords)) {
+      return("No keywords extracted or resume not uploaded.")
+    } else {
+      keywords <- removeStopwords(keywords, language = "fr")
+      return(paste(keywords, collapse = ", "))
     }
   })
 
@@ -178,41 +173,33 @@ server = function(input, output, session) {
   # GENERATE COVER LETTER WITH GPT
   observeEvent(input$generate_cover_letter_modal, {
 
-    # ensure there's a selected job and a resume uploaded
-    if (!is.null(input$resume) && !is.null(input$table_rows_selected)) {
+    # show spinner while operation is running
+    shinyjs::runjs('$("#spinner").removeClass("hidden");')
 
-      # show spinner while operation is running
-      shinyjs::runjs('$("#spinner").removeClass("hidden");')
-
-      # filter and sort data
-      dataset_filtered = filter_and_sort(dataset, combinedKeywords())
-      dataset_filtered = dataset_filtered %>% select(-c(Job.ID))
-      jobDescription = dataset_filtered[input$table_rows_selected, ]$Description
+    # filter and sort data
+    dataset_filtered = filter_and_sort(dataset, combinedKeywords())
+    dataset_filtered = dataset_filtered %>% select(-c(Job.ID))
+    jobDescription = dataset_filtered[input$table_rows_selected, ]$Description
       
-      # extract the path to the uploaded resume
-      resume_path = input$resume$datapath
-      resume = pdf_text(resume_path)
+    # extract the path to the uploaded resume
+    resume_path = input$resume$datapath
+    resume = pdf_text(resume_path)
       
-      # call the OpenAI API to generate a cover letter and output it
-      prompt = paste('Write a cover letter using the following resume and job: ',
-                     'Resume info: ', resume, '        ',
-                     'Job info: ', jobDescription)
-      coverLetter = GPT(prompt)
+    # call the OpenAI API to generate a cover letter and output it
+    prompt = paste('Write a cover letter using the following resume and job: ',
+                   'Resume info: ', resume, '        ',
+                   'Job info: ', jobDescription)
+    #coverLetter = GPT(prompt)
+    Sys.sleep(3)
+    coverLetter = 'WIP'
       
-      # hide spinner after operation is done
-      shinyjs::runjs('$("#spinner").addClass("hidden");')
+    # hide spinner after operation is done
+    shinyjs::runjs('$("#spinner").addClass("hidden");')
       
-      # output cover letter
-      output$coverLetterDisplay = renderText({
-        paste(coverLetter, collapse = "\n")
-      })
-      
-    # message for the user when no job selected
-    } else {
-      output$coverLetterDisplay = renderText(
-        'Something went wrong. Please try again later.'
-      )
-    }
+    # output cover letter
+    output$coverLetterDisplay = renderText({
+      paste(coverLetter, collapse = "\n")
+    })
   })
 
 
@@ -256,19 +243,15 @@ server = function(input, output, session) {
         tags$script(HTML(paste0("$('#apply_job').on('click', function() {
           window.open('", row_data$Url, "', '_blank');});"))),
 
+      div(id = "spinner", class = "spinner hidden"),
       footer = tagList(
-        div(id = "spinner",
-            class = "spinner hidden",
-            actionButton("generate_cover_letter_modal",
-                        "Generate Cover Letter for this Job",
-                        class = "btn-primary")),
+        actionButton("generate_cover_letter_modal", "Generate Cover Letter for this Job", class = "btn-primary"),
         verbatimTextOutput("coverLetterDisplay", placeholder = TRUE),
         div(class = "copy-container", actionButton("copyBtn", label = "Copy the text", class = "copy-btn", onclick = "copyToClipboard()")),
       ),
       easyClose = TRUE
     ))
-  })
-  
+  }) 
 }
 
 
